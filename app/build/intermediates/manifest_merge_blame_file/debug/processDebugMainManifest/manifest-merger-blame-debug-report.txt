@@ -1,0 +1,62 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.mimotts"
+4    android:versionCode="1"
+5    android:versionName="1.0.1" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="35" />
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:2:5-67
+11-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:2:22-64
+12    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+12-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:3:5-71
+12-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:3:22-68
+13    <uses-permission
+13-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:4:5-108
+14        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+14-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:4:22-78
+15        android:maxSdkVersion="28" />
+15-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:4:79-105
+16    <uses-permission
+16-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:5:5-107
+17        android:name="android.permission.READ_EXTERNAL_STORAGE"
+17-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:5:22-77
+18        android:maxSdkVersion="32" />
+18-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:5:78-104
+19
+20    <application
+20-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:7:5-20:19
+21        android:allowBackup="true"
+21-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:8:9-35
+22        android:debuggable="true"
+23        android:extractNativeLibs="false"
+24        android:label="MiMo TTS"
+24-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:11:9-33
+25        android:testOnly="true"
+26        android:theme="@style/AppTheme"
+26-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:10:9-40
+27        android:usesCleartextTraffic="false" >
+27-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:9:9-45
+28        <activity
+28-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:12:9-19:20
+29            android:name="com.example.mimotts.MainActivity"
+29-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:13:13-41
+30            android:exported="true" >
+30-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:14:13-36
+31            <intent-filter>
+31-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:15:13-18:29
+32                <action android:name="android.intent.action.MAIN" />
+32-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:16:17-69
+32-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:16:25-66
+33
+34                <category android:name="android.intent.category.LAUNCHER" />
+34-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:17:17-77
+34-->C:\Users\21642\Desktop\mimo-tts-android-web-tabs-java-stable\app\src\main\AndroidManifest.xml:17:27-74
+35            </intent-filter>
+36        </activity>
+37    </application>
+38
+39</manifest>

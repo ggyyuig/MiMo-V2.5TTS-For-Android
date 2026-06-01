@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>MiMo TTS</title>
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --card: rgba(255,255,255,.82);
+      --card-strong: #ffffff;
+      --text: #101828;
+      --muted: #667085;
+      --line: rgba(15,23,42,.10);
+      --primary: #111827;
+      --primary-2: #1f2937;
+      --blue: #3478f6;
+      --green: #16a34a;
+      --red: #dc2626;
+      --shadow: 0 18px 45px rgba(15, 23, 42, .10);
+      --radius: 24px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+      background:
+        radial-gradient(circle at 18% 10%, rgba(52,120,246,.22), transparent 30%),
+        radial-gradient(circle at 90% 8%, rgba(168,85,247,.18), transparent 28%),
+        linear-gradient(135deg, #f7fbff 0%, #f6f2ff 50%, #f8fbff 100%);
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { border: 0; cursor: pointer; }
+
+    .app {
+      width: min(100%, 780px);
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 18px 16px calc(92px + var(--safe-bottom));
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: 10px 0 14px;
+      backdrop-filter: blur(18px);
+    }
+
+    .headline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      color: #344054;
+      font-size: 12px;
+      box-shadow: 0 8px 22px rgba(15,23,42,.07);
+    }
+
+    h1 {
+      margin: 12px 0 4px;
+      font-size: 34px;
+      line-height: 1.05;
+      letter-spacing: -1.2px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #475467;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.78);
+      box-shadow: 0 8px 24px rgba(15,23,42,.08);
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+      font-size: 20px;
+    }
+
+    .page { display: none; animation: fadeIn .18s ease both; }
+    .page.active { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    .card {
+      margin-top: 16px;
+      padding: 18px;
+      border: 1px solid rgba(255,255,255,.78);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .card-title h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -.3px;
+    }
+
+    .small { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .muted { color: var(--muted); }
+
+    .field { margin-top: 14px; }
+    .label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #344054;
+    }
+
+    textarea, input[type="text"], input[type="password"], select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,.78);
+      outline: none;
+      color: var(--text);
+      padding: 14px 15px;
+      min-height: 52px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 210px;
+      line-height: 1.65;
+    }
+
+    input[type="range"] { width: 100%; accent-color: var(--primary); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .btn {
+      width: 100%;
+      min-height: 54px;
+      border-radius: 18px;
+      background: var(--primary);
+      color: white;
+      font-weight: 800;
+      box-shadow: 0 14px 30px rgba(17,24,39,.18);
+      transition: .15s ease;
+    }
+    .btn:active { transform: scale(.99); }
+    .btn:disabled { opacity: .48; cursor: not-allowed; }
+    .btn.secondary {
+      background: rgba(255,255,255,.82);
+      color: var(--primary);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+    .btn.blue { background: var(--blue); }
+    .btn.green { background: var(--green); }
+
+    .status {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: 13px;
+      line-height: 1.55;
+      display: none;
+    }
+    .status.show { display: block; }
+    .status.ok { color: #166534; background: rgba(22, 163, 74, .10); border: 1px solid rgba(22, 163, 74, .18); }
+    .status.err { color: #991b1b; background: rgba(220, 38, 38, .10); border: 1px solid rgba(220, 38, 38, .18); }
+    .status.info { color: #1e3a8a; background: rgba(52, 120, 246, .10); border: 1px solid rgba(52, 120, 246, .16); }
+
+    .audio-box {
+      border-radius: 22px;
+      background: rgba(255,255,255,.70);
+      border: 1px solid var(--line);
+      padding: 14px;
+    }
+    audio { width: 100%; margin-top: 8px; }
+
+    .upload-box {
+      border: 1.5px dashed rgba(15,23,42,.18);
+      background: rgba(255,255,255,.62);
+      border-radius: 22px;
+      padding: 16px;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .check-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 12px;
+      color: #475467;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .check-line input { margin-top: 3px; }
+
+    .bottom-tabs {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: min(100%, 780px);
+      z-index: 50;
+      padding: 10px 16px calc(10px + var(--safe-bottom));
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(24px);
+      border-top: 1px solid rgba(15,23,42,.08);
+    }
+
+    .tab-shell {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 6px;
+      background: rgba(15,23,42,.05);
+      border-radius: 24px;
+    }
+
+    .tab-btn {
+      min-height: 52px;
+      border-radius: 19px;
+      background: transparent;
+      color: #667085;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .tab-btn span:first-child { font-size: 19px; line-height: 1; }
+    .tab-btn.active {
+      background: white;
+      color: var(--primary);
+      box-shadow: 0 8px 20px rgba(15,23,42,.10);
+    }
+
+    .sheet-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(15,23,42,.28);
+      backdrop-filter: blur(8px);
+      display: none;
+      padding: 20px 16px calc(20px + var(--safe-bottom));
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .sheet-mask.show { display: flex; }
+
+    .sheet {
+      width: min(100%, 720px);
+      max-height: 86vh;
+      overflow: auto;
+      border-radius: 30px;
+      background: rgba(255,255,255,.96);
+      box-shadow: 0 30px 80px rgba(15,23,42,.25);
+      padding: 18px;
+    }
+
+    .sheet-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .sheet-head h2 { margin: 0; font-size: 21px; }
+
+    .empty {
+      min-height: 260px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+      padding: 18px;
+    }
+    .empty strong { color: var(--text); display: block; margin-bottom: 6px; font-size: 18px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(52,120,246,.10);
+      color: #1d4ed8;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.45);
+      border-top-color: white;
+      animation: spin .75s linear infinite;
+      vertical-align: -2px;
+      margin-left: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (min-width: 720px) {
+      .app { padding-top: 28px; }
+      h1 { font-size: 44px; }
+      .desktop-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 14px; align-items: start; }
+      textarea { min-height: 300px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="headline">
+        <div>
+          <div class="badge">✨ Android 本地 Web UI · MiMo V2.5 TTS</div>
+          <h1>MiMo 语音生成器</h1>
+        </div>
+        <button class="icon-btn" id="openSettingsBtn" aria-label="设置">⚙️</button>
+      </div>
+      <p class="subtitle">三大功能放在底部分页。API Token 放在设置里，本地保存，不写进代码。</p>
+    </header>
+
+    <main>
+      <section class="page active" id="page-generate">
+        <div class="desktop-grid">
+          <div class="card">
+            <div class="card-title">
+              <h2>合成文本</h2>
+              <span class="small" id="counter">0 / 4096</span>
+            </div>
+            <textarea id="textInput" maxlength="4096" placeholder="请输入要转换成语音的文字，例如：你好，我是 MiMo V2.5 TTS。"></textarea>
+            <div class="field">
+              <div class="label">风格提示，可选</div>
+              <input id="styleInput" type="text" maxlength="300" placeholder="例如：温柔、开心、新闻播报感、河南话、慢一点" />
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">
+              <h2>生成参数</h2>
+              <span class="pill" id="tokenState">未配置 Token</span>
+            </div>
+
+            <div class="field">
+              <div class="label">发音人 Voice / Speaker</div>
+              <select id="voiceSelect"></select>
+              <p class="small" id="voiceHint">内置音色与复刻音色都会显示在这里。</p>
+            </div>
+
+            <div class="field">
+              <div class="label"><span>语速 Speed</span><span id="speedValue">1.0x</span></div>
+              <input id="speedInput" type="range" min="0.5" max="2.0" step="0.1" value="1.0" />
+            </div>
+
+            <div class="field">
+              <div class="label"><span>音量 Volume</span><span id="volumeValue">80</span></div>
+              <input id="volumeInput" type="range" min="0" max="100" step="1" value="80" />
+            </div>
+
+            <div class="field">
+              <div class="label">输出格式</div>
+              <select id="formatSelect">
+                <option value="mp3">MP3</option>
+                <option value="wav">WAV</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <button class="btn" id="generateBtn">生成语音</button>
+            </div>
+            <div class="status" id="generateStatus"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-clone">
+        <div class="card">
+          <div class="card-title">
+            <h2>声音复刻 / 自定义音色</h2>
+            <span class="pill">VoiceClone</span>
+          </div>
+          <p class="small">上传或录制一段你有授权的声音样本，保存后会加入“生成语音”的音色列表。建议样本 10–30 秒、环境安静、单人声音。官方样本通常建议 mp3/wav。</p>
+
+          <div class="field">
+            <div class="label">音色名称</div>
+            <input id="cloneNameInput" type="text" placeholder="例如：我的声音、旁白音色、wds y" />
+          </div>
+
+          <div class="field upload-box">
+            <div class="label">上传音频样本</div>
+            <input id="sampleFileInput" type="file" accept=".mp3,.wav,.m4a,audio/*" />
+            <p class="small">如果上传 m4a 等格式，接口可能不接受；最稳的是 mp3 或 wav。</p>
+          </div>
+
+          <div class="field grid-2">
+            <button class="btn secondary" id="recordStartBtn">开始录音</button>
+            <button class="btn secondary" id="recordStopBtn" disabled>停止录音</button>
+          </div>
+
+          <div class="field audio-box" id="samplePreviewBox" style="display:none;">
+            <strong>样本预览</strong>
+            <audio id="sampleAudio" controls></audio>
+          </div>
+
+          <label class="check-line">
+            <input type="checkbox" id="consentCheck" />
+            <span>我确认上传/录制的是我自己的声音，或已获得声音本人授权，不用于冒充、诈骗或误导他人。</span>
+          </label>
+
+          <div class="field">
+            <button class="btn green" id="saveCloneBtn">保存为复刻音色</button>
+          </div>
+          <div class="status" id="cloneStatus"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <h2>已保存的复刻音色</h2>
+            <span class="small" id="cloneCount">0 个</span>
+          </div>
+          <div id="cloneList" class="small"></div>
+        </div>
+      </section>
+
+      <section class="page" id="page-result">
+        <div class="card">
+          <div class="card-title">
+            <h2>播放结果</h2>
+            <span class="pill" id="resultBadge">等待生成</span>
+          </div>
+
+          <div id="emptyResult" class="empty">
+            <div>
+              <strong>还没有生成语音</strong>
+              <span>去“生成”页输入文本，点击生成后会自动切换到这里。</span>
+            </div>
+          </div>
+
+          <div id="resultBox" style="display:none;">
+            <div class="audio-box">
+              <strong id="resultTitle">MiMo 生成音频</strong>
+              <p class="small" id="resultMeta"></p>
+              <audio id="resultAudio" controls></audio>
+            </div>
+            <div class="field grid-2">
+              <button class="btn" id="saveAudioBtn">保存到手机</button>
+              <button class="btn secondary" id="backGenerateBtn">继续生成</button>
+            </div>
+            <div class="status info show">音频会保存到手机“下载/MiMoTTS”目录。</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-tabs">
+    <div class="tab-shell">
+      <button class="tab-btn active" data-tab="generate"><span>🎙️</span><span>生成</span></button>
+      <button class="tab-btn" data-tab="clone"><span>🧬</span><span>复刻</span></button>
+      <button class="tab-btn" data-tab="result"><span>🎧</span><span>结果</span></button>
+    </div>
+  </nav>
+
+  <div class="sheet-mask" id="settingsSheet">
+    <div class="sheet">
+      <div class="sheet-head">
+        <h2>设置</h2>
+        <button class="icon-btn" id="closeSettingsBtn">✕</button>
+      </div>
+      <p class="small">API Token 只保存在当前 App 的本地存储里，不会写进 GitHub 代码。</p>
+
+      <div class="field">
+        <div class="label">MiMo API Token</div>
+        <input id="tokenInput" type="password" placeholder="粘贴你的 MiMo API Token" />
+      </div>
+
+      <div class="field">
+        <div class="label">认证方式</div>
+        <select id="authTypeSelect">
+          <option value="api-key">api-key 请求头</option>
+          <option value="bearer">Bearer Token</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="label">Base URL</div>
+        <input id="baseUrlInput" type="text" value="https://api.xiaomimimo.com/v1" />
+      </div>
+
+      <div class="field">
+        <div class="label">接口路径</div>
+        <input id="endpointInput" type="text" value="/chat/completions" />
+      </div>
+
+      <label class="check-line">
+        <input type="checkbox" id="rememberTokenCheck" checked />
+        <span>记住到本机，下次自动填入。</span>
+      </label>
+
+      <div class="field grid-2">
+        <button class="btn" id="saveSettingsBtn">保存设置</button>
+        <button class="btn secondary" id="clearSettingsBtn">清除 Token</button>
+      </div>
+      <div class="status" id="settingsStatus"></div>
+    </div>
+  </div>
+
+  <script>
+    const BUILTIN_VOICES = [
+      { label: 'MiMo 默认音色', value: 'mimo_default' },
+      { label: '冰糖 · 中文女声', value: '冰糖' },
+      { label: '茉莉 · 中文女声', value: '茉莉' },
+      { label: '苏打 · 中文男声', value: '苏打' },
+      { label: '白桦 · 中文男声', value: '白桦' },
+      { label: 'Mia · English Female', value: 'Mia' },
+      { label: 'Chloe · English Female', value: 'Chloe' },
+      { label: 'Milo · English Male', value: 'Milo' },
+      { label: 'Dean · English Male', value: 'Dean' },
+    ];
+
+    const $ = id => document.getElementById(id);
+    const tabs = document.querySelectorAll('.tab-btn');
+    const pages = {
+      generate: $('page-generate'),
+      clone: $('page-clone'),
+      result: $('page-result'),
+    };
+
+    let cloneSampleDataUrl = '';
+    let cloneSampleName = '';
+    let currentAudioBase64 = '';
+    let currentAudioMime = 'audio/mpeg';
+    let currentFilename = 'mimo_tts.mp3';
+
+    const store = {
+      getSettings() {
+        return {
+          token: localStorage.getItem('mimo_token') || '',
+          authType: localStorage.getItem('mimo_auth_type') || 'api-key',
+          baseUrl: localStorage.getItem('mimo_base_url') || 'https://api.xiaomimimo.com/v1',
+          endpoint: localStorage.getItem('mimo_endpoint') || '/chat/completions',
+        };
+      },
+      saveSettings(settings, remember) {
+        if (remember) localStorage.setItem('mimo_token', settings.token || '');
+        else localStorage.removeItem('mimo_token');
+        localStorage.setItem('mimo_auth_type', settings.authType || 'api-key');
+        localStorage.setItem('mimo_base_url', settings.baseUrl || 'https://api.xiaomimimo.com/v1');
+        localStorage.setItem('mimo_endpoint', settings.endpoint || '/chat/completions');
+      },
+      getClones() {
+        try { return JSON.parse(localStorage.getItem('mimo_clone_voices') || '[]'); }
+        catch (_) { return []; }
+      },
+      saveClones(items) {
+        localStorage.setItem('mimo_clone_voices', JSON.stringify(items));
+      }
+    };
+
+    function showPage(name) {
+      Object.entries(pages).forEach(([key, el]) => el.classList.toggle('active', key === name));
+      tabs.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === name));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showStatus(el, type, message) {
+      el.className = `status show ${type}`;
+      el.textContent = message;
+    }
+
+    function hideStatus(el) {
+      el.className = 'status';
+      el.textContent = '';
+    }
+
+    function updateTokenState() {
+      const settings = store.getSettings();
+      $('tokenState').textContent = settings.token ? 'Token 已配置' : '未配置 Token';
+    }
+
+    function loadSettingsUI() {
+      const s = store.getSettings();
+      $('tokenInput').value = s.token;
+      $('authTypeSelect').value = s.authType;
+      $('baseUrlInput').value = s.baseUrl;
+      $('endpointInput').value = s.endpoint;
+      updateTokenState();
+    }
+
+    function renderVoices(selected) {
+      const select = $('voiceSelect');
+      const clones = store.getClones();
+      select.innerHTML = '';
+
+      const group1 = document.createElement('optgroup');
+      group1.label = '内置音色';
+      BUILTIN_VOICES.forEach(v => {
+        const option = document.createElement('option');
+        option.value = v.value;
+        option.textContent = v.label;
+        group1.appendChild(option);
+      });
+      select.appendChild(group1);
+
+      if (clones.length) {
+        const group2 = document.createElement('optgroup');
+        group2.label = '复刻音色';
+        clones.forEach(v => {
+          const option = document.createElement('option');
+          option.value = `clone:${v.id}`;
+          option.textContent = `${v.name} · 复刻音色`;
+          group2.appendChild(option);
+        });
+        select.appendChild(group2);
+      }
+
+      select.value = selected || localStorage.getItem('mimo_last_voice') || '茉莉';
+      if (!select.value) select.value = '茉莉';
+      updateVoiceHint();
+      renderCloneList();
+    }
+
+    function renderCloneList() {
+      const clones = store.getClones();
+      $('cloneCount').textContent = `${clones.length} 个`;
+      if (!clones.length) {
+        $('cloneList').innerHTML = '还没有保存复刻音色。';
+        return;
+      }
+      $('cloneList').innerHTML = clones.map(v => `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid rgba(15,23,42,.08);">
+          <div><strong style="color:#101828;">${escapeHtml(v.name)}</strong><br><span>${new Date(v.createdAt).toLocaleString()}</span></div>
+          <button class="btn secondary" style="width:auto;min-height:38px;padding:0 12px;border-radius:14px;" onclick="deleteClone('${v.id}')">删除</button>
+        </div>
+      `).join('');
+    }
+
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>'"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[c]));
+    }
+
+    window.deleteClone = function(id) {
+      const clones = store.getClones().filter(v => v.id !== id);
+      store.saveClones(clones);
+      renderVoices();
+      showStatus($('cloneStatus'), 'ok', '已删除该复刻音色。');
+    };
+
+    function updateVoiceHint() {
+      const value = $('voiceSelect').value;
+      if (value.startsWith('clone:')) {
+        $('voiceHint').textContent = '当前选择的是复刻音色，生成时会使用 VoiceClone 模型。';
+      } else {
+        $('voiceHint').textContent = '当前选择的是内置音色，生成时会使用普通 TTS 模型。';
+      }
+    }
+
+    function getVoicePayload() {
+      const value = $('voiceSelect').value;
+      if (!value.startsWith('clone:')) return value;
+      const id = value.replace('clone:', '');
+      const clone = store.getClones().find(v => v.id === id);
+      if (!clone) throw new Error('复刻音色不存在，请重新选择。');
+      return clone.dataUrl;
+    }
+
+    function setGenerateLoading(loading) {
+      $('generateBtn').disabled = loading;
+      $('generateBtn').innerHTML = loading ? '生成中 <span class="spinner"></span>' : '生成语音';
+    }
+
+    function base64ToDataUrl(base64, mime) {
+      return `data:${mime};base64,${base64}`;
+    }
+
+    function generateSpeech() {
+      const settings = store.getSettings();
+      const text = $('textInput').value.trim();
+      hideStatus($('generateStatus'));
+
+      if (!window.AndroidBridge) {
+        showStatus($('generateStatus'), 'err', '当前不是安卓 App 环境。请用 Android Studio 安装 App 后运行。');
+        return;
+      }
+      if (!settings.token) {
+        showStatus($('generateStatus'), 'err', '请先点击右上角设置，填写 MiMo API Token。');
+        $('settingsSheet').classList.add('show');
+        return;
+      }
+      if (!text) {
+        showStatus($('generateStatus'), 'err', '请输入要合成的文本。');
+        return;
+      }
+
+      let voicePayload;
+      try { voicePayload = getVoicePayload(); }
+      catch (err) {
+        showStatus($('generateStatus'), 'err', err.message);
+        return;
+      }
+
+      const payload = {
+        token: settings.token,
+        authType: settings.authType,
+        baseUrl: settings.baseUrl,
+        endpoint: settings.endpoint,
+        text,
+        voice: voicePayload,
+        speed: Number($('speedInput').value),
+        volume: Number($('volumeInput').value),
+        format: $('formatSelect').value,
+        stylePrompt: $('styleInput').value.trim(),
+      };
+
+      localStorage.setItem('mimo_last_voice', $('voiceSelect').value);
+      setGenerateLoading(true);
+      showStatus($('generateStatus'), 'info', '正在请求 MiMo 生成音频，请稍等。');
+      AndroidBridge.synthesize(JSON.stringify(payload));
+    }
+
+    function saveCloneVoice() {
+      const name = $('cloneNameInput').value.trim() || `复刻音色 ${store.getClones().length + 1}`;
+      hideStatus($('cloneStatus'));
+      if (!cloneSampleDataUrl) {
+        showStatus($('cloneStatus'), 'err', '请先上传音频样本，或点击开始录音。');
+        return;
+      }
+      if (!$('consentCheck').checked) {
+        showStatus($('cloneStatus'), 'err', '请先勾选授权确认。');
+        return;
+      }
+
+      const clones = store.getClones();
+      const item = {
+        id: 'c_' + Date.now(),
+        name,
+        fileName: cloneSampleName || 'record.wav',
+        dataUrl: cloneSampleDataUrl,
+        createdAt: Date.now(),
+      };
+      clones.push(item);
+      store.saveClones(clones);
+      renderVoices(`clone:${item.id}`);
+      showStatus($('cloneStatus'), 'ok', `已保存并自动选择：${name}。现在可以去“生成”页合成语音。`);
+      setTimeout(() => showPage('generate'), 650);
+    }
+
+    function loadSampleFromFile(file) {
+      if (!file) return;
+      cloneSampleName = file.name;
+      const reader = new FileReader();
+      reader.onload = () => {
+        cloneSampleDataUrl = reader.result;
+        $('sampleAudio').src = cloneSampleDataUrl;
+        $('samplePreviewBox').style.display = 'block';
+        const lower = file.name.toLowerCase();
+        if (!lower.endsWith('.mp3') && !lower.endsWith('.wav')) {
+          showStatus($('cloneStatus'), 'info', '已载入样本，但官方更推荐 mp3/wav。m4a 等格式如果生成失败，请换成 wav 或 mp3。');
+        } else {
+          showStatus($('cloneStatus'), 'ok', `已载入样本：${file.name}`);
+        }
+      };
+      reader.onerror = () => showStatus($('cloneStatus'), 'err', '读取音频文件失败。');
+      reader.readAsDataURL(file);
+    }
+
+    function startNativeRecording() {
+      hideStatus($('cloneStatus'));
+      if (!window.AndroidBridge) {
+        showStatus($('cloneStatus'), 'err', '当前不是安卓 App 环境，无法调用本地录音。');
+        return;
+      }
+      $('recordStartBtn').disabled = true;
+      $('recordStopBtn').disabled = false;
+      AndroidBridge.startRecording();
+    }
+
+    function stopNativeRecording() {
+      if (!window.AndroidBridge) return;
+      $('recordStopBtn').disabled = true;
+      AndroidBridge.stopRecording();
+      showStatus($('cloneStatus'), 'info', '正在整理录音，请稍等。');
+    }
+
+    window.MiMoNative = {
+      onSynthesisSuccess(base64Audio, mimeType, filename) {
+        currentAudioBase64 = base64Audio;
+        currentAudioMime = mimeType || 'audio/mpeg';
+        currentFilename = filename || 'mimo_tts.mp3';
+        const dataUrl = base64ToDataUrl(base64Audio, currentAudioMime);
+        $('resultAudio').src = dataUrl;
+        $('resultTitle').textContent = 'MiMo 生成音频';
+        $('resultMeta').textContent = `${currentFilename} · ${currentAudioMime}`;
+        $('emptyResult').style.display = 'none';
+        $('resultBox').style.display = 'block';
+        $('resultBadge').textContent = '已生成';
+        setGenerateLoading(false);
+        showStatus($('generateStatus'), 'ok', '生成成功，已切换到播放结果。');
+        showPage('result');
+        setTimeout(() => $('resultAudio').play().catch(() => {}), 200);
+      },
+      onSynthesisError(message) {
+        setGenerateLoading(false);
+        showStatus($('generateStatus'), 'err', message || '生成失败。');
+        showPage('generate');
+      },
+      onNativeRecordingStarted() {
+        showStatus($('cloneStatus'), 'info', '正在录音，建议 10–30 秒，保持环境安静。');
+      },
+      onNativeRecordingReady(dataUrl) {
+        cloneSampleDataUrl = dataUrl;
+        cloneSampleName = 'record.wav';
+        $('sampleAudio').src = dataUrl;
+        $('samplePreviewBox').style.display = 'block';
+        $('recordStartBtn').disabled = false;
+        $('recordStopBtn').disabled = true;
+        showStatus($('cloneStatus'), 'ok', '录音完成，已转为 WAV 样本。');
+      }
+    };
+
+    tabs.forEach(btn => btn.addEventListener('click', () => showPage(btn.dataset.tab)));
+
+    $('textInput').addEventListener('input', () => {
+      $('counter').textContent = `${$('textInput').value.length} / 4096`;
+    });
+    $('speedInput').addEventListener('input', () => $('speedValue').textContent = `${Number($('speedInput').value).toFixed(1)}x`);
+    $('volumeInput').addEventListener('input', () => $('volumeValue').textContent = $('volumeInput').value);
+    $('voiceSelect').addEventListener('change', updateVoiceHint);
+    $('generateBtn').addEventListener('click', generateSpeech);
+    $('sampleFileInput').addEventListener('change', e => loadSampleFromFile(e.target.files[0]));
+    $('recordStartBtn').addEventListener('click', startNativeRecording);
+    $('recordStopBtn').addEventListener('click', stopNativeRecording);
+    $('saveCloneBtn').addEventListener('click', saveCloneVoice);
+    $('saveAudioBtn').addEventListener('click', () => {
+      if (!currentAudioBase64) return;
+      AndroidBridge.saveAudio(currentAudioBase64, currentAudioMime, currentFilename);
+    });
+    $('backGenerateBtn').addEventListener('click', () => showPage('generate'));
+
+    $('openSettingsBtn').addEventListener('click', () => {
+      loadSettingsUI();
+      $('settingsSheet').classList.add('show');
+    });
+    $('closeSettingsBtn').addEventListener('click', () => $('settingsSheet').classList.remove('show'));
+    $('settingsSheet').addEventListener('click', e => {
+      if (e.target === $('settingsSheet')) $('settingsSheet').classList.remove('show');
+    });
+    $('saveSettingsBtn').addEventListener('click', () => {
+      const settings = {
+        token: $('tokenInput').value.trim(),
+        authType: $('authTypeSelect').value,
+        baseUrl: $('baseUrlInput').value.trim() || 'https://api.xiaomimimo.com/v1',
+        endpoint: $('endpointInput').value.trim() || '/chat/completions',
+      };
+      store.saveSettings(settings, $('rememberTokenCheck').checked);
+      updateTokenState();
+      showStatus($('settingsStatus'), 'ok', '设置已保存。');
+      setTimeout(() => $('settingsSheet').classList.remove('show'), 500);
+    });
+    $('clearSettingsBtn').addEventListener('click', () => {
+      localStorage.removeItem('mimo_token');
+      $('tokenInput').value = '';
+      updateTokenState();
+      showStatus($('settingsStatus'), 'ok', 'Token 已清除。');
+    });
+
+    loadSettingsUI();
+    renderVoices('茉莉');
+  </script>
+</body>
+</html>
