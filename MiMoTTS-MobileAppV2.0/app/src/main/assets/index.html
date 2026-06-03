@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#eef4ff" />
+<title>MiMo 语音生成器</title>
+<style>
+:root{--bg1:#eef4ff;--bg2:#f7edff;--ink:#111827;--muted:#667085;--card:rgba(255,255,255,.82);--line:rgba(15,23,42,.1);--blue:#2563eb;--green:#16a34a;--danger:#ef4444;--shadow:0 20px 60px rgba(31,41,55,.12);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;min-height:100%;color:var(--ink);background:radial-gradient(circle at 12% 5%,#dff7ff 0,transparent 36%),radial-gradient(circle at 86% 2%,#f4d8ff 0,transparent 40%),linear-gradient(160deg,var(--bg1),var(--bg2));}body{overflow-x:hidden}.app{min-height:100vh;padding:calc(env(safe-area-inset-top) + 16px) 16px calc(100px + env(safe-area-inset-bottom));}.top{position:relative;padding:0 0 18px 0}.gear{position:absolute;left:0;top:4px;width:56px;height:56px;border:0;border-radius:20px;background:rgba(255,255,255,.82);box-shadow:0 12px 32px rgba(30,41,59,.12);font-size:25px}.pill{display:inline-flex;align-items:center;gap:6px;margin-left:66px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.78);color:#334155;font-size:13px;box-shadow:0 8px 24px rgba(31,41,55,.08)}h1{font-size:42px;letter-spacing:-2px;line-height:1.05;margin:20px 0 8px;font-weight:900}.sub{font-size:16px;line-height:1.6;color:#667085;margin:0 4px}.card{background:var(--card);border:1px solid rgba(255,255,255,.65);border-radius:28px;box-shadow:var(--shadow);padding:20px;margin:16px 0;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}.row{display:flex;align-items:center;justify-content:space-between;gap:12px}.title{font-weight:850;font-size:21px}.badge{font-size:13px;color:#2257b8;background:#eaf1ff;border-radius:999px;padding:7px 12px;font-weight:700}.hint{color:#667085;line-height:1.65;font-size:14px}.label{display:block;font-size:16px;font-weight:750;margin:18px 0 8px;color:#344054}.count{color:#6b7280;font-size:14px}.input,.select,textarea{width:100%;border:1px solid var(--line);background:rgba(255,255,255,.72);border-radius:19px;padding:15px 16px;font-size:17px;outline:none;color:#111827;box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}textarea{min-height:190px;resize:vertical;line-height:1.55}.smallarea{min-height:96px}.select{appearance:auto}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.btn{border:0;border-radius:18px;padding:15px 18px;font-size:17px;font-weight:850;background:#111827;color:#fff;box-shadow:0 12px 22px rgba(15,23,42,.12)}.btn.secondary{background:rgba(255,255,255,.78);color:#111827;border:1px solid var(--line);box-shadow:none}.btn.green{background:var(--green)}.btn:disabled{opacity:.5}.sliderRow{display:flex;align-items:center;gap:14px}.sliderRow input{flex:1}.val{width:54px;text-align:right;font-weight:800;color:#475467}.uploadBox{border:1.5px dashed rgba(15,23,42,.17);border-radius:24px;padding:16px;margin-top:12px;background:rgba(255,255,255,.42)}.check{display:flex;gap:10px;align-items:flex-start;margin:14px 2px;color:#475467;line-height:1.55}.check input{width:20px;height:20px;margin-top:2px}.resultBox{min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}.resultBox audio{width:100%;margin-top:10px}.log{width:100%;white-space:pre-wrap;text-align:left;font-size:13px;line-height:1.5;color:#475467;background:rgba(255,255,255,.55);border:1px solid var(--line);border-radius:16px;padding:12px;max-height:180px;overflow:auto}.tabs{position:fixed;left:14px;right:14px;bottom:calc(10px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px;border-radius:30px;background:rgba(255,255,255,.78);box-shadow:0 -10px 42px rgba(15,23,42,.12);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);z-index:20}.tab{border:0;background:transparent;border-radius:22px;padding:8px 2px;color:#667085;font-size:12px;font-weight:800}.tab span{display:block;font-size:23px;margin-bottom:3px}.tab.active{background:white;color:#111827;box-shadow:0 8px 22px rgba(15,23,42,.10)}.page{display:none}.page.active{display:block}.modal{position:fixed;inset:0;background:rgba(15,23,42,.22);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:50;display:none;align-items:flex-end}.modal.show{display:flex}.sheet{width:100%;background:rgba(255,255,255,.92);border-radius:30px 30px 0 0;padding:24px 18px calc(24px + env(safe-area-inset-bottom));box-shadow:0 -24px 70px rgba(15,23,42,.2);max-height:86vh;overflow:auto}.x{border:0;border-radius:18px;width:50px;height:50px;background:#fff;font-size:30px}.toast{position:fixed;left:20px;right:20px;bottom:calc(92px + env(safe-area-inset-bottom));background:#111827;color:white;padding:14px 16px;border-radius:18px;font-weight:750;text-align:center;display:none;z-index:80;box-shadow:0 16px 38px rgba(0,0,0,.16)}.toast.show{display:block}.switchLine{display:flex;gap:10px;align-items:center;margin-top:14px}.switchLine input{width:20px;height:20px}.chipRow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.chip{border:1px solid var(--line);background:rgba(255,255,255,.7);border-radius:999px;padding:8px 11px;font-size:13px;color:#475467}.voiceList{display:flex;flex-direction:column;gap:10px;margin-top:12px}.voiceItem{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.62)}.voiceName{font-weight:850;font-size:16px;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.voiceMeta{font-size:12px;color:#667085;margin-top:3px}.miniBtn{border:1px solid var(--line);background:rgba(255,255,255,.84);border-radius:14px;padding:9px 11px;font-size:13px;font-weight:850;color:#111827}.miniBtn.danger{color:#dc2626;background:#fff5f5}.emptyVoice{border:1px dashed rgba(15,23,42,.18);border-radius:18px;padding:18px;text-align:center;color:#667085;background:rgba(255,255,255,.45)}.hide{display:none!important}@media(max-width:380px){h1{font-size:36px}.app{padding-left:12px;padding-right:12px}.card{border-radius:24px;padding:16px}.tabs{left:10px;right:10px}.title{font-size:19px}}
+
+html[data-theme="dark"]{--bg1:#070b16;--bg2:#151020;--ink:#f8fafc;--muted:#a3adc2;--card:rgba(15,23,42,.82);--line:rgba(226,232,240,.16);--blue:#60a5fa;--green:#22c55e;--danger:#fb7185;--shadow:0 22px 60px rgba(0,0,0,.42)}
+html[data-theme="dark"] body{background:radial-gradient(circle at 12% 5%,rgba(14,165,233,.18) 0,transparent 36%),radial-gradient(circle at 86% 2%,rgba(168,85,247,.18) 0,transparent 40%),linear-gradient(160deg,var(--bg1),var(--bg2));}
+html[data-theme="dark"] .gear,html[data-theme="dark"] .pill,html[data-theme="dark"] .tabs,html[data-theme="dark"] .sheet,html[data-theme="dark"] .btn.secondary,html[data-theme="dark"] .chip,html[data-theme="dark"] .miniBtn{background:rgba(15,23,42,.82);color:var(--ink);border-color:var(--line)}
+html[data-theme="dark"] .tab.active{background:rgba(30,41,59,.96);color:var(--ink)}
+html[data-theme="dark"] .badge{background:rgba(37,99,235,.22);color:#bfdbfe}
+html[data-theme="dark"] .hint,html[data-theme="dark"] .sub,html[data-theme="dark"] .count,html[data-theme="dark"] .voiceMeta{color:var(--muted)}
+html[data-theme="dark"] .label,html[data-theme="dark"] .voiceName{color:var(--ink)}
+html[data-theme="dark"] .input,html[data-theme="dark"] .select,html[data-theme="dark"] textarea,html[data-theme="dark"] .uploadBox,html[data-theme="dark"] .log,html[data-theme="dark"] .emptyVoice,html[data-theme="dark"] .voiceItem{background:rgba(15,23,42,.64);color:var(--ink);border-color:var(--line);box-shadow:none}
+html[data-theme="dark"] .input::placeholder,html[data-theme="dark"] textarea::placeholder{color:#64748b}
+html[data-theme="dark"] select option{background:#0f172a;color:#f8fafc}
+
+
+/* V2.2 Liquid Glass UI refresh */
+:root{
+  --glass:rgba(255,255,255,.52);
+  --glass-strong:rgba(255,255,255,.72);
+  --glass-border:rgba(255,255,255,.72);
+  --glass-inner:rgba(255,255,255,.42);
+  --accent1:#7dd3fc;
+  --accent2:#c084fc;
+  --accent3:#86efac;
+}
+body::before{content:"";position:fixed;inset:-20%;pointer-events:none;z-index:-1;background:radial-gradient(circle at 15% 8%,rgba(125,211,252,.55),transparent 28%),radial-gradient(circle at 85% 14%,rgba(216,180,254,.55),transparent 30%),radial-gradient(circle at 48% 92%,rgba(134,239,172,.32),transparent 32%);filter:blur(8px);animation:liquidFlow 18s ease-in-out infinite alternate}
+@keyframes liquidFlow{0%{transform:translate3d(-2%,0,0) scale(1)}100%{transform:translate3d(2%,-1%,0) scale(1.05)}}
+.card,.sheet,.tabs,.pill,.gear,.input,.select,textarea,.uploadBox,.voiceItem,.emptyVoice,.log,.btn.secondary,.chip,.miniBtn{background:linear-gradient(145deg,rgba(255,255,255,.68),rgba(255,255,255,.34));border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 18px 48px rgba(31,41,55,.14),0 2px 10px rgba(255,255,255,.18);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%)}
+.card{position:relative;overflow:hidden}.card::before,.sheet::before,.tabs::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.62),transparent 34%,rgba(255,255,255,.18) 60%,transparent);mix-blend-mode:screen}.card::after{content:"";position:absolute;left:10%;right:10%;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.95),transparent)}
+.btn{position:relative;overflow:hidden;background:linear-gradient(135deg,#111827,#263142);box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 14px 34px rgba(15,23,42,.2);touch-action:manipulation}.btn.green{background:linear-gradient(135deg,#16a34a,#22c55e,#10b981)}.btn::after,.miniBtn::after,.tab.active::after{content:"";position:absolute;left:12%;right:12%;top:5px;height:35%;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.45),transparent);pointer-events:none}.tab,.gear,.x,.btn,.miniBtn{cursor:pointer;touch-action:manipulation}.tabs{z-index:999;overflow:hidden}.tab{position:relative}.tab.active{background:linear-gradient(145deg,rgba(255,255,255,.84),rgba(255,255,255,.45));box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 12px 26px rgba(15,23,42,.14)}
+.modal{z-index:2000}.toast{z-index:3000}.sheet{position:relative;overflow:auto}.gear{z-index:5}.pill{white-space:nowrap}.input:focus,.select:focus,textarea:focus{border-color:rgba(96,165,250,.72);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 0 0 4px rgba(96,165,250,.18),0 18px 48px rgba(31,41,55,.12)}
+html[data-theme="dark"]{--glass-border:rgba(148,163,184,.22)}
+html[data-theme="dark"] .card,html[data-theme="dark"] .sheet,html[data-theme="dark"] .tabs,html[data-theme="dark"] .pill,html[data-theme="dark"] .gear,html[data-theme="dark"] .input,html[data-theme="dark"] .select,html[data-theme="dark"] textarea,html[data-theme="dark"] .uploadBox,html[data-theme="dark"] .voiceItem,html[data-theme="dark"] .emptyVoice,html[data-theme="dark"] .log,html[data-theme="dark"] .btn.secondary,html[data-theme="dark"] .chip,html[data-theme="dark"] .miniBtn{background:linear-gradient(145deg,rgba(15,23,42,.72),rgba(15,23,42,.42));border-color:rgba(148,163,184,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 18px 48px rgba(0,0,0,.45)}
+html[data-theme="dark"] .tab.active{background:linear-gradient(145deg,rgba(51,65,85,.88),rgba(30,41,59,.55))}
+
+
+
+/* V2.2 Dedicated Dark Glass Theme - keep layout same, only switch to dark palette */
+html[data-theme="dark"], html.theme-dark{
+  color-scheme: dark;
+  --bg1:#05070d!important;
+  --bg2:#101420!important;
+  --ink:#f7fbff!important;
+  --muted:#a7b3c8!important;
+  --card:rgba(11,18,32,.78)!important;
+  --line:rgba(226,232,240,.18)!important;
+  --blue:#7ab7ff!important;
+  --green:#22d36b!important;
+  --danger:#fb7185!important;
+  --shadow:0 22px 70px rgba(0,0,0,.58)!important;
+  --glass:rgba(15,23,42,.58)!important;
+  --glass-strong:rgba(15,23,42,.82)!important;
+  --glass-border:rgba(226,232,240,.20)!important;
+  --glass-inner:rgba(30,41,59,.45)!important;
+}
+html[data-theme="dark"],html[data-theme="dark"] body,html.theme-dark,html.theme-dark body{
+  background:
+    radial-gradient(circle at 12% 5%,rgba(56,189,248,.20) 0,transparent 34%),
+    radial-gradient(circle at 86% 2%,rgba(192,132,252,.18) 0,transparent 40%),
+    radial-gradient(circle at 48% 92%,rgba(34,211,107,.10) 0,transparent 34%),
+    linear-gradient(160deg,#05070d,#101420)!important;
+  color:var(--ink)!important;
+}
+html[data-theme="dark"] body::before,html.theme-dark body::before{
+  background:
+    radial-gradient(circle at 15% 8%,rgba(56,189,248,.26),transparent 28%),
+    radial-gradient(circle at 85% 14%,rgba(192,132,252,.24),transparent 30%),
+    radial-gradient(circle at 48% 92%,rgba(34,211,107,.14),transparent 32%)!important;
+  opacity:.95!important;
+}
+html[data-theme="dark"] .card,html[data-theme="dark"] .sheet,html[data-theme="dark"] .tabs,
+html[data-theme="dark"] .pill,html[data-theme="dark"] .gear,html[data-theme="dark"] .input,
+html[data-theme="dark"] .select,html[data-theme="dark"] textarea,html[data-theme="dark"] .uploadBox,
+html[data-theme="dark"] .voiceItem,html[data-theme="dark"] .emptyVoice,html[data-theme="dark"] .log,
+html[data-theme="dark"] .btn.secondary,html[data-theme="dark"] .chip,html[data-theme="dark"] .miniBtn,
+html.theme-dark .card,html.theme-dark .sheet,html.theme-dark .tabs,
+html.theme-dark .pill,html.theme-dark .gear,html.theme-dark .input,
+html.theme-dark .select,html.theme-dark textarea,html.theme-dark .uploadBox,
+html.theme-dark .voiceItem,html.theme-dark .emptyVoice,html.theme-dark .log,
+html.theme-dark .btn.secondary,html.theme-dark .chip,html.theme-dark .miniBtn{
+  background:linear-gradient(145deg,rgba(15,23,42,.82),rgba(15,23,42,.46))!important;
+  border-color:rgba(226,232,240,.18)!important;
+  color:var(--ink)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 18px 48px rgba(0,0,0,.52)!important;
+}
+html[data-theme="dark"] .card::before,html[data-theme="dark"] .sheet::before,html[data-theme="dark"] .tabs::before,
+html.theme-dark .card::before,html.theme-dark .sheet::before,html.theme-dark .tabs::before{
+  background:linear-gradient(135deg,rgba(255,255,255,.13),transparent 34%,rgba(255,255,255,.05) 60%,transparent)!important;
+}
+html[data-theme="dark"] .tab.active,html.theme-dark .tab.active{
+  background:linear-gradient(145deg,rgba(51,65,85,.95),rgba(30,41,59,.68))!important;
+  color:#f8fafc!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 12px 26px rgba(0,0,0,.42)!important;
+}
+html[data-theme="dark"] .tab,html.theme-dark .tab{color:#a7b3c8!important}
+html[data-theme="dark"] .badge,html.theme-dark .badge{background:rgba(59,130,246,.22)!important;color:#bfdbfe!important}
+html[data-theme="dark"] .sub,html[data-theme="dark"] .hint,html[data-theme="dark"] .count,
+html[data-theme="dark"] .voiceMeta,html[data-theme="dark"] .val,html[data-theme="dark"] .check,
+html.theme-dark .sub,html.theme-dark .hint,html.theme-dark .count,
+html.theme-dark .voiceMeta,html.theme-dark .val,html.theme-dark .check{color:var(--muted)!important}
+html[data-theme="dark"] .label,html[data-theme="dark"] .title,html[data-theme="dark"] .voiceName,
+html.theme-dark .label,html.theme-dark .title,html.theme-dark .voiceName{color:var(--ink)!important}
+html[data-theme="dark"] .input::placeholder,html[data-theme="dark"] textarea::placeholder,
+html.theme-dark .input::placeholder,html.theme-dark textarea::placeholder{color:#6f7f96!important}
+html[data-theme="dark"] select option,html.theme-dark select option{background:#0f172a!important;color:#f8fafc!important}
+html[data-theme="dark"] audio,html.theme-dark audio{filter:invert(.88) hue-rotate(180deg) saturate(.82)!important}
+html[data-theme="dark"] .x,html.theme-dark .x{background:rgba(15,23,42,.88)!important;color:#f8fafc!important;border:1px solid rgba(226,232,240,.16)!important}
+html[data-theme="dark"] .modal,html.theme-dark .modal{background:rgba(2,6,23,.55)!important}
+html[data-theme="dark"] .toast,html.theme-dark .toast{background:#e5e7eb!important;color:#0f172a!important}
+
+</style>
+</head><body>
+<div class="app">
+  <header class="top">
+    <button class="gear" onclick="openSettings()">⚙️</button>
+    <div class="pill">✨ Android 本地 APP · MiMo V2.5 TTS · V2.2</div>
+    <h1>MiMo 语音生成器</h1>
+    <p class="sub">四个底部功能页：生成、复刻、描绘音色、结果。API Token 和 URL 都放在左上角设置里，本地保存。</p>
+  </header>
+
+  <section id="page-gen" class="page active">
+    <div class="card">
+      <div class="row"><div class="title">合成文本</div><div class="count"><span id="textCount">0</span> / 4096</div></div>
+      <textarea id="ttsText" maxlength="4096" placeholder="请输入要转换成语音的文字，例如：你好，我是 MiMo V2.5 TTS。"></textarea>
+      <label class="label">风格提示，可选</label>
+      <input id="stylePrompt" class="input" placeholder="例如：温柔、开心、新闻播报感、河南话、慢一点" />
+    </div>
+    <div class="card">
+      <div class="row"><div class="title">生成参数</div><div id="tokenBadge" class="badge">Token 未配置</div></div>
+      <label class="label">发音人 Voice / Speaker</label>
+      <select id="voiceSelect" class="select"></select>
+      <p class="hint" id="voiceTip">内置音色使用普通 TTS；保存过复刻音色后，也会出现在这里。</p>
+      <label class="label">语速 Speed</label><div class="sliderRow"><input id="speed" type="range" min="0.5" max="2" step="0.05" value="1"><div id="speedVal" class="val">1.0x</div></div>
+      <label class="label">音量 Volume</label><div class="sliderRow"><input id="volume" type="range" min="0" max="100" step="1" value="80"><div id="volumeVal" class="val">80</div></div>
+      <label class="label">格式</label><select id="format" class="select"><option value="wav">wav</option><option value="mp3">mp3</option></select>
+      <button class="btn green" style="width:100%;margin-top:18px" onclick="generatePresetOrClone()">开始生成语音</button>
+    </div>
+  </section>
+
+  <section id="page-clone" class="page">
+    <div class="card">
+      <div class="row"><div class="title">声音复刻 / 自定义音色</div><div class="badge">VoiceClone</div></div>
+      <p class="hint">上传或录制一段你有授权的声音样本，保存后会加入“生成语音”的音色列表。建议样本 10–30 秒、环境安静、单人声音；最稳是 mp3/wav。</p>
+      <label class="label">音色名称</label><input id="cloneName" class="input" placeholder="例如：我的声音、旁白音色、wds y" />
+      <div class="uploadBox"><label class="label" style="margin-top:0">上传音频样本</label><input id="audioFile" type="file" accept="audio/*" class="input" /><p class="hint">上传 m4a/webm 时接口可能不接受；本 APP 录音会保存成 wav。</p></div>
+      <div class="grid2" style="margin-top:14px"><button class="btn secondary" id="recBtn" onclick="startRecord()">开始录音</button><button class="btn secondary" id="stopBtn" onclick="stopRecord()" disabled>停止录音</button></div>
+      <audio id="sampleAudio" controls class="hide" style="width:100%;margin-top:14px"></audio>
+      <label class="check"><input id="consent" type="checkbox" /> <span>我确认上传/录制的是我自己的声音，或已获得声音本人授权，不用于冒充、诈骗或误导他人。</span></label>
+      <button class="btn green" style="width:100%;margin-top:10px" onclick="saveCloneVoice()">保存为复刻音色</button>
+    </div>
+
+    <div class="card">
+      <div class="row"><div class="title">复刻音色管理</div><div id="cloneCountBadge" class="badge">0 个音色</div></div>
+      <p class="hint">这里显示你自己保存过的复刻音色。可以试听、删除单个音色，也可以一键清空。删除后“生成”页的音色列表会同步更新。</p>
+      <div id="voiceManagerList" class="voiceList"></div>
+      <button class="btn secondary" style="width:100%;margin-top:14px;color:#dc2626" onclick="clearCloneVoices()">清空全部复刻音色</button>
+    </div>
+  </section>
+
+  <section id="page-design" class="page">
+    <div class="card">
+      <div class="row"><div class="title">描绘音色</div><div class="badge">VoiceDesign</div></div>
+      <p class="hint">不用上传音频，用文字描述你想要的音色，然后直接合成。比如“低沉温柔的年轻男声，普通话标准，略带磁性”。</p>
+      <label class="label">要合成的文本</label><textarea id="designText" maxlength="4096" class="smallarea" placeholder="输入要让这个音色朗读的文字"></textarea>
+      <label class="label">音色描绘</label><textarea id="voiceDesc" maxlength="500" class="smallarea" placeholder="例如：清爽年轻男声，声音干净，略带少年感，语气自然亲切"></textarea>
+      <label class="label">表达风格，可选</label><input id="designStyle" class="input" placeholder="例如：温柔、旁白感、新闻播报、开心一点" />
+      <label class="label">语速</label><div class="sliderRow"><input id="designSpeed" type="range" min="0.5" max="2" step="0.05" value="1"><div id="designSpeedVal" class="val">1.0x</div></div>
+      <label class="label">音量</label><div class="sliderRow"><input id="designVolume" type="range" min="0" max="100" step="1" value="80"><div id="designVolumeVal" class="val">80</div></div>
+      <button class="btn green" style="width:100%;margin-top:18px" onclick="generateVoiceDesign()">按描绘生成语音</button>
+      <div class="chipRow"><button class="chip" onclick="fillDesc('清爽年轻男声，声音干净，略带少年感，语气自然亲切')">少年感男声</button><button class="chip" onclick="fillDesc('温柔甜美的年轻女声，语速适中，适合故事旁白')">温柔女声</button><button class="chip" onclick="fillDesc('低沉浑厚的中年男声，稳定有磁性，适合纪录片旁白')">磁性男声</button></div>
+    </div>
+  </section>
+
+  <section id="page-result" class="page">
+    <div class="card resultBox">
+      <div class="row" style="width:100%"><div class="title">播放结果</div><div id="statusBadge" class="badge">等待生成</div></div>
+      <div id="emptyResult"><h2>还没有生成语音</h2><p class="hint">去“生成”或“描绘音色”页输入文本，点击生成后会自动切换到这里。</p></div>
+      <audio id="player" class="hide" controls></audio>
+      <div id="downloadWrap" class="hide" style="width:100%"><button class="btn secondary" style="width:100%" onclick="downloadAudio()">下载音频文件</button><p id="downloadHint" class="hint" style="margin:10px 0 0;text-align:left;width:100%"></p></div>
+      <div id="log" class="log hide"></div>
+    </div>
+  </section>
+</div>
+
+<nav class="tabs">
+  <button class="tab active" data-page="gen" onclick="go('gen')"><span>🎙️</span>生成</button>
+  <button class="tab" data-page="clone" onclick="go('clone')"><span>🧬</span>复刻</button>
+  <button class="tab" data-page="design" onclick="go('design')"><span>✨</span>描绘</button>
+  <button class="tab" data-page="result" onclick="go('result')"><span>🎧</span>结果</button>
+</nav>
+
+<div id="settingsModal" class="modal" onclick="if(event.target===this)closeSettings()"><div class="sheet">
+  <div class="row"><div class="title" style="font-size:25px">设置</div><button class="x" onclick="closeSettings()">×</button></div>
+  <p class="hint">API Token 只保存在当前 APP 的本地存储里，不写入代码。Base URL 和接口路径可以自己改。</p>
+  <label class="label">MiMo API Token</label><input id="apiToken" class="input" type="password" placeholder="粘贴你的 Token" />
+  <label class="label">认证方式</label><select id="authType" class="select"><option value="bearer">Bearer Authorization</option><option value="api-key">api-key 请求头</option></select>
+  <label class="label">Base URL</label><input id="baseUrl" class="input" value="https://api.xiaomimimo.com/v1" />
+  <label class="label">接口路径</label><input id="endpointPath" class="input" value="/chat/completions" />
+  <label class="label">下载位置</label><input id="downloadDir" class="input" placeholder="例如：MiMoTTS，保存到 Download/MiMoTTS" />
+  <p class="hint" style="margin:8px 0 0">下载会保存到手机 Download 目录下的这个文件夹里；留空则保存到 Download/MiMoTTS。</p>
+  <label class="label">深色模式</label><select id="themeMode" class="select"><option value="system">跟随系统</option><option value="light">浅色</option><option value="dark">深色</option></select>
+  <label class="label">普通 TTS 模型</label><input id="modelTTS" class="input" value="mimo-v2.5-tts" />
+  <label class="label">复刻模型</label><input id="modelClone" class="input" value="mimo-v2.5-tts-voiceclone" />
+  <label class="label">描绘音色模型</label><input id="modelDesign" class="input" value="mimo-v2.5-tts-voicedesign" />
+  <label class="switchLine"><input id="sendExtra" type="checkbox" /> <span>额外发送 speed / volume 字段（默认关闭，避免接口不兼容）</span></label>
+  <div class="grid2" style="margin-top:18px"><button class="btn" onclick="saveSettings()">保存设置</button><button class="btn secondary" onclick="clearToken()">清除 Token</button></div>
+</div></div>
+<div id="toast" class="toast"></div>
+<script>
+const $=id=>document.getElementById(id);const voices=[['冰糖 - 中文女声','冰糖'],['茉莉 - 中文女声','茉莉'],['苏打 - 中文男声','苏打'],['白桦 - 中文男声','白桦'],['Mia - English Female','Mia'],['Chloe - English Female','Chloe'],['Milo - English Male','Milo'],['Dean - English Male','Dean']];let latestAudioUrl='',latestFormat='wav',sampleDataUrl='',recording=null,recChunks=[];
+const defaults={apiToken:'',authType:'bearer',baseUrl:'https://api.xiaomimimo.com/v1',endpointPath:'/chat/completions',downloadDir:'MiMoTTS',themeMode:'system',modelTTS:'mimo-v2.5-tts',modelClone:'mimo-v2.5-tts-voiceclone',modelDesign:'mimo-v2.5-tts-voicedesign',sendExtra:false};
+function getSettings(){return {...defaults,...JSON.parse(localStorage.getItem('mimoSettings')||'{}')}}function setSettings(s){localStorage.setItem('mimoSettings',JSON.stringify(s));updateTokenBadge();applyTheme()}
+function getSystemDark(){try{if(window.AndroidBridge&&typeof window.AndroidBridge.isSystemDark==='function')return !!window.AndroidBridge.isSystemDark()}catch(e){}try{return window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches}catch(e){return false}}function applyTheme(){const s=getSettings();const mode=s.themeMode==='system'?(getSystemDark()?'dark':'light'):s.themeMode;document.documentElement.setAttribute('data-theme',mode);document.documentElement.classList.toggle('theme-dark',mode==='dark');document.body&&document.body.classList.toggle('theme-dark',mode==='dark');try{document.querySelector('meta[name=theme-color]')?.setAttribute('content',mode==='dark'?'#05070d':'#eef4ff')}catch(e){}}
+if(window.matchMedia){try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme)}catch(e){}}applyTheme();
+function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>el.classList.remove('show'),2200)}
+function go(p){document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));$('page-'+p).classList.add('active');document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('active',e.dataset.page===p));}
+document.addEventListener('click',function(e){const tab=e.target.closest&&e.target.closest('.tab[data-page]');if(tab){e.preventDefault();go(tab.dataset.page)}});
+function openSettings(){const s=getSettings();for(const k in defaults){if($(k)){if($(k).type==='checkbox')$(k).checked=!!s[k];else $(k).value=s[k]??''}}$('settingsModal').classList.add('show')}function closeSettings(){$('settingsModal').classList.remove('show')}
+function saveSettings(){const s={};for(const k in defaults){if($(k))s[k]=$(k).type==='checkbox'?$(k).checked:$(k).value.trim()}setSettings(s);closeSettings();toast('设置已保存')}
+function clearToken(){const s=getSettings();s.apiToken='';setSettings(s);$('apiToken').value='';toast('Token 已清除')}
+function updateTokenBadge(){const ok=!!getSettings().apiToken;$('tokenBadge').textContent=ok?'Token 已配置':'Token 未配置'}
+function cloneVoices(){try{return JSON.parse(localStorage.getItem('cloneVoices')||'[]')}catch(e){return []}}function saveClones(list){localStorage.setItem('cloneVoices',JSON.stringify(list));renderVoices();renderVoiceManager()}
+function fmtTime(ts){if(!ts)return '未知时间';try{return new Date(ts).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}catch(e){return '已保存'}}
+function renderVoices(){const sel=$('voiceSelect');const old=sel.value;sel.innerHTML='';voices.forEach(v=>sel.add(new Option(v[0],v[1])));cloneVoices().forEach((v,i)=>sel.add(new Option('复刻 · '+v.name,'clone:'+i)));if([...sel.options].some(o=>o.value===old))sel.value=old}
+function renderVoiceManager(){const box=$('voiceManagerList');const badge=$('cloneCountBadge');if(!box||!badge)return;const list=cloneVoices();badge.textContent=list.length+' 个音色';if(!list.length){box.innerHTML='<div class="emptyVoice">暂无复刻音色。保存后会在这里管理，也会出现在“生成”页音色列表。</div>';return}box.innerHTML=list.map((v,i)=>`<div class="voiceItem"><div><div class="voiceName">${escapeHtml(v.name||('复刻音色 '+(i+1)))}</div><div class="voiceMeta">${fmtTime(v.created)} · 本地保存</div></div><button class="miniBtn" onclick="playCloneVoice(${i})">试听</button><button class="miniBtn danger" onclick="deleteCloneVoice(${i})">删除</button></div>`).join('')}
+function escapeHtml(t){return String(t).replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
+function playCloneVoice(i){const c=cloneVoices()[i];if(!c||!c.dataUrl)return toast('这个音色没有样本数据');const a=$('sampleAudio');a.src=c.dataUrl;a.classList.remove('hide');a.play().catch(()=>toast('已载入试听，点击播放器播放'))}
+function deleteCloneVoice(i){const list=cloneVoices();const c=list[i];if(!c)return;if(!confirm('确定删除复刻音色「'+c.name+'」吗？删除后生成页也不会再显示它。'))return;list.splice(i,1);saveClones(list);toast('已删除复刻音色')}
+function clearCloneVoices(){const list=cloneVoices();if(!list.length)return toast('当前没有复刻音色');if(!confirm('确定清空全部复刻音色吗？此操作不可恢复。'))return;saveClones([]);toast('已清空全部复刻音色')}
+$('ttsText').addEventListener('input',()=>{$('textCount').textContent=$('ttsText').value.length});['speed','volume','designSpeed','designVolume'].forEach(id=>$(id).addEventListener('input',()=>{let v=$(id).value;$(id+'Val').textContent=id.toLowerCase().includes('speed')?(+v).toFixed(1)+'x':v}));
+$('audioFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{sampleDataUrl=r.result;$('sampleAudio').src=sampleDataUrl;$('sampleAudio').classList.remove('hide');toast('样本已读取')};r.readAsDataURL(f)});
+async function startRecord(){try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});const ctx=new (window.AudioContext||window.webkitAudioContext)();const source=ctx.createMediaStreamSource(stream);const processor=ctx.createScriptProcessor(4096,1,1);let buffers=[];source.connect(processor);processor.connect(ctx.destination);processor.onaudioprocess=e=>buffers.push(new Float32Array(e.inputBuffer.getChannelData(0)));recording={stream,ctx,source,processor,buffers,rate:ctx.sampleRate};$('recBtn').disabled=true;$('stopBtn').disabled=false;toast('正在录音')}catch(e){toast('录音权限失败：'+e.message)}}
+function stopRecord(){if(!recording)return;recording.processor.disconnect();recording.source.disconnect();recording.stream.getTracks().forEach(t=>t.stop());const wav=encodeWav(recording.buffers,recording.rate);sampleDataUrl='data:audio/wav;base64,'+arrayBufferToBase64(wav);$('sampleAudio').src=sampleDataUrl;$('sampleAudio').classList.remove('hide');$('recBtn').disabled=false;$('stopBtn').disabled=true;recording=null;toast('录音已保存为 WAV')}
+function encodeWav(buffers,sampleRate){let len=buffers.reduce((a,b)=>a+b.length,0),data=new Float32Array(len),off=0;buffers.forEach(b=>{data.set(b,off);off+=b.length});let buffer=new ArrayBuffer(44+data.length*2),view=new DataView(buffer);writeStr(view,0,'RIFF');view.setUint32(4,36+data.length*2,true);writeStr(view,8,'WAVE');writeStr(view,12,'fmt ');view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,1,true);view.setUint32(24,sampleRate,true);view.setUint32(28,sampleRate*2,true);view.setUint16(32,2,true);view.setUint16(34,16,true);writeStr(view,36,'data');view.setUint32(40,data.length*2,true);let p=44;for(let i=0;i<data.length;i++,p+=2){let s=Math.max(-1,Math.min(1,data[i]));view.setInt16(p,s<0?s*0x8000:s*0x7fff,true)}return buffer}function writeStr(v,o,s){for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))}function arrayBufferToBase64(buf){let bin='',bytes=new Uint8Array(buf);for(let i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);return btoa(bin)}
+function saveCloneVoice(){let name=$('cloneName').value.trim();if(!name)return toast('先填音色名称');if(!sampleDataUrl)return toast('先上传或录制音频样本');if(!$('consent').checked)return toast('请先勾选授权确认');const list=cloneVoices();if(list.some(v=>v.name===name)){if(!confirm('已经有同名音色「'+name+'」，是否继续保存为新的音色？'))return;name=name+' '+(list.filter(v=>String(v.name).startsWith(name)).length+1)}list.push({name,dataUrl:sampleDataUrl,created:Date.now()});saveClones(list);$('cloneName').value='';$('audioFile').value='';$('consent').checked=false;sampleDataUrl='';$('sampleAudio').classList.add('hide');toast('复刻音色已保存');go('clone')}
+function buildInstruction(text,speed,volume,style,clone){let p=['你是一个高质量语音合成引擎。','请将后续文本合成为自然清晰的语音。',`语速参考：${speed}x。`,`音量参考：${volume}/100。`];if(clone)p.push('当前使用音频样本复刻音色，请尽量保持目标说话人的音色特征。');if(style)p.push('风格要求：'+style+'。');return p.join('\n')}
+function payloadNormal(text,voice,voiceData){const s=getSettings(),sp=+$('speed').value,vol=+$('volume').value,fmt=$('format').value,style=$('stylePrompt').value.trim();let audio={format:fmt,voice:voiceData||voice};if(s.sendExtra&&!voiceData){audio.speed=sp;audio.volume=vol/100}return {model:voiceData?s.modelClone:s.modelTTS,messages:[{role:'user',content:buildInstruction(text,sp,vol,style,!!voiceData)},{role:'assistant',content:text}],audio}}
+function payloadDesign(){const s=getSettings(),text=$('designText').value.trim(),desc=$('voiceDesc').value.trim(),sp=+$('designSpeed').value,vol=+$('designVolume').value,fmt=$('format').value,style=$('designStyle').value.trim();let inst=['你是一个高质量语音合成引擎。','请根据以下音色描述，将后续文本合成为自然清晰的语音。','音色描述：'+desc,`语速参考：${sp}x。`,`音量参考：${vol}/100。`];if(style)inst.push('风格要求：'+style+'。');let audio={format:fmt};if(s.sendExtra){audio.speed=sp;audio.volume=vol/100}return {model:s.modelDesign,messages:[{role:'user',content:inst.join('\n')},{role:'assistant',content:text}],audio}}
+async function generatePresetOrClone(){const text=$('ttsText').value.trim();if(!text)return toast('请输入合成文本');const value=$('voiceSelect').value;let voice=value,data=null;if(value.startsWith('clone:')){const i=+value.split(':')[1];const c=cloneVoices()[i];if(!c)return toast('这个复刻音色已不存在，请重新选择');voice=c.name;data=c.dataUrl}await callMimo(payloadNormal(text,voice,data))}
+async function generateVoiceDesign(){if(!$('designText').value.trim())return toast('请输入合成文本');if(!$('voiceDesc').value.trim())return toast('请输入音色描绘');await callMimo(payloadDesign())}function fillDesc(t){$('voiceDesc').value=t}
+function apiUrl(){const s=getSettings();return s.baseUrl.replace(/\/$/,'')+'/'+s.endpointPath.replace(/^\//,'')}function headers(){const s=getSettings();if(!s.apiToken)throw new Error('请先在左上角设置里填写 API Token');return s.authType==='api-key'?{'api-key':s.apiToken}:{'Authorization':'Bearer '+s.apiToken}}
+async function callMimo(payload){try{const s=getSettings();latestFormat=payload.audio?.format||'wav';go('result');$('emptyResult').classList.add('hide');$('player').classList.add('hide');$('downloadWrap').classList.add('hide');$('log').classList.remove('hide');$('log').textContent='正在请求 MiMo API...';$('statusBadge').textContent='生成中';const res=await postJson(apiUrl(),headers(),payload);handleApiResponse(res)}catch(e){$('statusBadge').textContent='失败';$('log').classList.remove('hide');$('log').textContent=e.message;toast(e.message)}}
+function postJson(url,headers,body){if(window.AndroidBridge){return new Promise((resolve,reject)=>{const id='r'+Date.now()+Math.random().toString(16).slice(2);window.NativeBridge._cbs[id]={resolve,reject};window.AndroidBridge.postJson(id,url,JSON.stringify(headers),JSON.stringify(body));})}return fetch(url,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json, audio/mpeg, audio/wav, */*',...headers},body:JSON.stringify(body)}).then(async r=>({status:r.status,contentType:r.headers.get('content-type')||'',base64:arrayBufferToBase64(await r.arrayBuffer()),error:''}))}
+window.NativeBridge={_cbs:{},onResponse(str){const o=JSON.parse(str);const cb=this._cbs[o.id];if(!cb)return;delete this._cbs[o.id];o.error?cb.reject(new Error(o.error)):cb.resolve(o)}};
+function b64ToText(b64){try{return decodeURIComponent(escape(atob(b64)))}catch(e){return atob(b64)}}function handleApiResponse(res){if(res.status>=400){let txt=b64ToText(res.base64||'');throw new Error(friendly(res.status,txt))}let ct=(res.contentType||'').split(';')[0];let audioB64=res.base64;if(!ct.startsWith('audio/')){const data=JSON.parse(b64ToText(res.base64));audioB64=data?.choices?.[0]?.message?.audio?.data;if(!audioB64)throw new Error('MiMo 返回成功，但没有找到 choices[0].message.audio.data');ct=latestFormat==='mp3'?'audio/mpeg':'audio/wav'}latestAudioUrl=`data:${ct};base64,${audioB64}`;$('player').src=latestAudioUrl;$('player').classList.remove('hide');$('downloadWrap').classList.remove('hide');$('log').textContent='生成成功，可以播放或下载。';$('downloadHint').textContent='下载前可以自定义文件名，保存位置在左上角设置里调整。';$('statusBadge').textContent='生成完成';toast('生成成功')}function friendly(code,raw){if(code===401)return '鉴权失败：请检查 Token 或认证方式。';if(code===403)return '无权限：请检查模型权限、账户额度或区域限制。';if(code===404)return '接口不存在：请检查 Base URL 和接口路径。';if(code===413)return '音频样本太大，请换短一点的样本。';if(code===429)return '请求过多或额度不足。';return `请求失败 HTTP ${code}\n${raw.slice(0,800)}`}
+function cleanFileName(name){return String(name||'').replace(/[\\/:*?"<>|\n\r\t]/g,'_').replace(/\s+/g,' ').trim().slice(0,80)}
+function splitDataUrl(dataUrl){const m=String(dataUrl||'').match(/^data:([^;]+);base64,(.*)$/);return m?{mime:m[1],base64:m[2]}:null}
+function downloadAudio(){
+  if(!latestAudioUrl)return toast('还没有可下载的音频');
+  const s=getSettings();
+  const def='mimo-tts-'+new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  let name=prompt('输入音频文件名，不用写后缀',def);
+  if(name===null)return;
+  name=cleanFileName(name)||def;
+  const ext=latestFormat==='mp3'?'mp3':'wav';
+  if(!name.toLowerCase().endsWith('.'+ext))name+='.'+ext;
+  const parts=splitDataUrl(latestAudioUrl);
+  if(window.AndroidBridge&&parts){
+    try{
+      const ret=JSON.parse(window.AndroidBridge.saveBase64Audio(name,parts.mime,parts.base64,s.downloadDir||'MiMoTTS'));
+      if(ret.ok){$('downloadHint').textContent='已保存到：'+ret.path;toast('下载成功');return}
+      toast('下载失败：'+ret.error);$('downloadHint').textContent='下载失败：'+ret.error;return;
+    }catch(e){toast('原生下载失败：'+e.message)}
+  }
+  const a=document.createElement('a');a.href=latestAudioUrl;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  $('downloadHint').textContent='浏览器下载已触发。如果没有反应，请在安卓 APP 内使用新版原生下载。';
+}
+
+renderVoices();renderVoiceManager();updateTokenBadge();applyTheme();
+</script></body></html>
